@@ -17,13 +17,53 @@
 package lk.ac.mrt.cse.dbs.simpleexpensemanager;
 
 import android.app.Application;
+import android.content.Context;
 import android.test.ApplicationTestCase;
 
+import androidx.test.core.app.ApplicationProvider;
+
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import java.text.ParseException;
+
+import lk.ac.mrt.cse.dbs.simpleexpensemanager.control.ExpenseManager;
+import lk.ac.mrt.cse.dbs.simpleexpensemanager.control.PersistentExpenseManager;
+import lk.ac.mrt.cse.dbs.simpleexpensemanager.data.exception.InvalidAccountException;
+import lk.ac.mrt.cse.dbs.simpleexpensemanager.data.model.ExpenseType;
+
+import static org.junit.Assert.assertTrue;
 /**
  * <a href="http://d.android.com/tools/testing/testing_android.html">Testing Fundamentals</a>
  */
-public class ApplicationTest extends ApplicationTestCase<Application> {
-    public ApplicationTest() {
-        super(Application.class);
+public class ApplicationTest {
+    private static ExpenseManager testExpenceManager;
+
+
+    @BeforeClass
+    public static void setup() {
+        Context cont = ApplicationProvider.getApplicationContext();
+        testExpenceManager = new PersistentExpenseManager(cont);
+    }
+
+
+    @Test
+    public void testAddAccount(){
+        testExpenceManager.addAccount("190019B", "BOC", "Abi", 6000.0);
+        assertTrue(testExpenceManager.getAccountNumbersList().contains("190019B"));
+    }
+
+
+    @Test
+    public void testAddExpence(){
+        try{
+            int sizeOfLogsArr = testExpenceManager.getTransactionLogs().size();
+            testExpenceManager.updateAccountBalance("12349A",18, 5, 2022, ExpenseType.EXPENSE, "100");
+            assertEquals(testExpenceManager.getTransactionLogs().size() , sizeOfLogsArr + 1);
+        }catch (InvalidAccountException | ParseException e){
+
+        }
+
     }
 }
